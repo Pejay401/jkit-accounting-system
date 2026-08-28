@@ -1,0 +1,23 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn(['avatar_data', 'avatar_mime_type']);
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->binary('avatar_data')->nullable()->after('avatar_url');
+            $table->string('avatar_mime_type')->nullable()->after('avatar_data');
+        });
+    }
+};
