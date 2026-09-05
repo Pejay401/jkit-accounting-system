@@ -1,16 +1,19 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\SalesOrders;
 
-use App\Filament\Resources\SaleResource\Pages\CreateSale;
-use App\Filament\Resources\SaleResource\Pages\EditSale;
-use App\Filament\Resources\SaleResource\Pages\ListSales;
+use App\Filament\Resources\SalesOrders\Pages\CreateSale;
+use App\Filament\Resources\SalesOrders\Pages\EditSale;
+use App\Filament\Resources\SalesOrders\Pages\ListSales;
+use App\Models\Product;
 use App\Models\Sale;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -29,6 +32,8 @@ class SaleResource extends Resource
 
     protected static string | \UnitEnum | null $navigationGroup = 'Sales';
 
+    protected static ?int $navigationSort = 7;
+
     protected static ?string $slug = 'sales-orders';
 
     public static function form(Schema $schema): Schema
@@ -42,15 +47,56 @@ class SaleResource extends Resource
                             ->label('Customer')
                             ->required()
                             ->maxLength(255),
-                        TextInput::make('product_or_service')
+                        Select::make('product_or_service')
                             ->label('Product or service')
+                            ->options(fn (): array => Product::query()
+                                ->where('is_active', true)
+                                ->orderBy('type')
+                                ->orderBy('name')
+                                ->get()
+                                ->groupBy('type')
+                                ->map(fn ($items): array => $items->pluck('name', 'name')->all())
+                                ->all())
+                            ->searchable()
+                            ->native(false)
+                            ->live()
+                            ->afterStateUpdated(function (?string $state, Set $set): void {
+                                $price = Product::query()
+                                    ->where('is_active', true)
+                                    ->where('name', $state)
+                                    ->value('price');
+
+                                $set('amount', $price !== null ? number_format((float) $price, 2, '.', '') : null);
+                            })
                             ->required()
-                            ->maxLength(255),
-                        TextInput::make('amount')
+                            ->placeholder('Select a product or service'),
+                        Select::make('amount')
                             ->label('Order amount')
-                            ->numeric()
                             ->prefix('PHP')
-                            ->minValue(0)
+                            ->options(function (Get $get): array {
+                                $selectedItem = $get('product_or_service');
+
+                                if (filled($selectedItem)) {
+                                    $price = Product::query()
+                                        ->where('is_active', true)
+                                        ->where('name', $selectedItem)
+                                        ->value('price');
+
+                                    return $price === null
+                                        ? []
+                                        : [number_format((float) $price, 2, '.', '') => 'PHP ' . number_format((float) $price, 2)];
+                                }
+
+                                return Product::query()
+                                    ->where('is_active', true)
+                                    ->orderBy('price')
+                                    ->pluck('price')
+                                    ->mapWithKeys(fn ($price): array => [
+                                        number_format((float) $price, 2, '.', '') => 'PHP ' . number_format((float) $price, 2),
+                                    ])
+                                    ->all();
+                            })
+                            ->native(false)
                             ->required(),
                         DatePicker::make('transaction_date')
                             ->label('Order date')

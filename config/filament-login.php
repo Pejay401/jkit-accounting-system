@@ -22,7 +22,7 @@ return [
 
     'contact_email' => env('FILAMENT_LOGIN_CONTACT_EMAIL', 'support@jkit.com'),
 
-    'contact_phone' => env('FILAMENT_LOGIN_CONTACT_PHONE', '(+63) 918 305 2342'),
+    'contact_phone' => env('FILAMENT_LOGIN_CONTACT_PHONE', '(+63) 9764618736'),
 
     /*
     |--------------------------------------------------------------------------
@@ -44,7 +44,7 @@ return [
 
     'nav_links' => [
         ['label' => 'Home', 'url' => '#'],
-        ['label' => 'About Us', 'url' => '#'],
+        ['label' => 'About Us', 'url' => '/about'],
         ['label' => 'Services', 'url' => '#'],
         ['label' => 'Login', 'url' => '/admin/login', 'active' => true],
     ],

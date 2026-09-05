@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\SaleResource\Pages;
+namespace App\Filament\Resources\SalesOrders\Pages;
 
-use App\Filament\Resources\SaleResource;
+use App\Filament\Resources\SalesOrders\SaleResource;
 use Filament\Resources\Pages\ListRecords;
 
 class ListSales extends ListRecords

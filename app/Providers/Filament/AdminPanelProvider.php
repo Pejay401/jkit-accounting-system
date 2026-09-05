@@ -58,8 +58,6 @@ class AdminPanelProvider extends PanelProvider
             ->navigationItems([
                 NavigationItem::make('Customers')->group('Sales')->url('#')->sort(1),
                 NavigationItem::make('Customer Groups')->group('Sales')->url('#')->sort(2),
-                NavigationItem::make('Products')->group('Sales')->url('#')->sort(3),
-                NavigationItem::make('Services')->group('Sales')->url('#')->sort(4),
                 NavigationItem::make('Price Lists')->group('Sales')->url('#')->sort(5),
                 NavigationItem::make('Quotations')->group('Sales')->url('#')->sort(6),
                 NavigationItem::make('Delivery')->group('Sales')->url('#')->sort(8),
